@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.PROD
+    ? ""
+    : "http://localhost:3000";
 export async function apiFetch(path, options = {}) {
     const response = await fetch(`${API_URL}${path}`, {
         ...options,

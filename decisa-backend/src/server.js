@@ -13,15 +13,15 @@ const PORT = Number(process.env.PORT) || 3000;
 // =========================
 // Middleware
 // =========================
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:4173",
-];
-
-app.use(cors({
-    origin: allowedOrigins,
-    credentials: true,
-}));
+if (!process.env.NETLIFY) {
+    app.use(cors({
+        origin: [
+            "http://localhost:5173",
+            "http://localhost:4173",
+        ],
+        credentials: true,
+    }));
+}
 app.use(express.json());
 app.use(cookieParser());
 // =========================
