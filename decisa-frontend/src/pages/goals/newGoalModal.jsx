@@ -36,8 +36,8 @@ export default function newGoalModal({ onClose, onCreated, onUpdated, editingGoa
             setError(null);
             const goalId = editingGoal?.id;
             const response = await fetch(goalId
-                ? `http://localhost:3000/api/goals/${goalId}`
-                : "http://localhost:3000/api/goals", {
+                ? `/api/goals/${goalId}`
+                : "/api/goals", {
                 method: goalId ? "PATCH" : "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -38,8 +38,8 @@ export default function TaskModal({ task, onClose, onSuccess, }) {
             setSaving(true);
             setError(null);
             const response = await fetch(isEditing
-                ? `http://localhost:3000/api/tasks/${task.id}`
-                : "http://localhost:3000/api/tasks", {
+                ? `/api/tasks/${task.id}`
+                : "/api/tasks", {
                 method: isEditing ? "PATCH" : "POST",
                 headers: {
                     "Content-Type": "application/json",

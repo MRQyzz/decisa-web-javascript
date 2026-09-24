@@ -34,8 +34,8 @@ export default function NewPlanModal({ onClose, onCreated, onUpdated, editingPla
             setError(null);
             const planId = editingPlan?.id;
             const response = await fetch(planId
-                ? `http://localhost:3000/api/plans/${planId}`
-                : "http://localhost:3000/api/plans", {
+                ? `/api/plans/${planId}`
+                : "/api/plans", {
                 method: planId ? "PATCH" : "POST",
                 headers: {
                     "Content-Type": "application/json",
