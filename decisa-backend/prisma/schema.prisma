@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PlanStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id           String @id @default(uuid()) @db.Uuid
+  email        String @unique
+  passwordHash String @map("password_hash")
+
+  username    String? @unique
+  displayName String  @map("display_name")
+
+  avatarUrl  String? @map("avatar_url")
+  bio        String?
+  location   String?
+  websiteUrl String? @map("website_url")
+  githubUrl  String? @map("github_url")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  lastLoginAt DateTime? @map("last_login_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  settings UserSettings?
+  sessions Session[]
+
+  plans Plan[]
+  tasks Task[]
+  goals Goal[]
+
+  @@map("users")
+}
+
+model Session {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  refreshTokenHash String @unique @map("refresh_token_hash")
+
+  deviceName String? @map("device_name")
+  userAgent  String? @map("user_agent")
+  ipAddress  String? @map("ip_address")
+
+  expiresAt DateTime  @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model UserSettings {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @unique @map("user_id") @db.Uuid
+
+  theme String @default("dark")
+
+  accentColor String @default("indigo") @map("accent_color")
+
+  compactSidebar Boolean @default(false) @map("compact_sidebar")
+
+  dailySummaryEnabled Boolean @default(true) @map("daily_summary_enabled")
+
+  aiRecommendationsEnabled Boolean @default(true) @map("ai_recommendations_enabled")
+
+  deadlineRemindersEnabled Boolean @default(true) @map("deadline_reminders_enabled")
+
+  habitStreakAlertsEnabled Boolean @default(true) @map("habit_streak_alerts_enabled")
+
+  twoFactorEnabled Boolean @default(false) @map("two_factor_enabled")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model Plan {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  title       String
+  description String?
+
+  status   PlanStatus @default(ACTIVE)
+  priority Priority   @default(MEDIUM)
+
+  progress Decimal @default(0) @db.Decimal(5, 2)
+
+  dueDate   DateTime? @map("due_date")
+
+  completedAt DateTime? @map("completed_at")
+
+  icon  String?
+  color String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks Task[]
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([userId, dueDate])
+  @@map("plans")
+}
+
+model Task {
+  id     String  @id @default(uuid()) @db.Uuid
+  userId String  @map("user_id") @db.Uuid
+  planId String? @map("plan_id") @db.Uuid
+
+  title       String
+  description String?
+
+  status   TaskStatus @default(TODO)
+  priority Priority   @default(MEDIUM)
+
+  dueDate     DateTime? @map("due_date")
+  completedAt DateTime? @map("completed_at")
+
+  estimatedMinutes Int? @map("estimated_minutes")
+
+  position Int @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([planId])
+  @@index([userId, status])
+  @@index([userId, dueDate])
+  @@map("tasks")
+}
+
+model Goal {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+
+  title       String
+  description String?
+  priority    Priority @default(MEDIUM)
+
+  targetDate  DateTime? @map("target_date")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, targetDate])
+  @@map("goals")
+}
