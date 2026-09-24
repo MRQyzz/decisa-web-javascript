@@ -1,5 +1,5 @@
 [build]
-  command = "npm install --prefix decisa-backend && npm install --prefix decisa-frontend && cd decisa-backend && npx prisma generate && cd ../decisa-frontend && npm run build"
+  command = "npm install --include=dev --prefix decisa-backend && npm install --include=dev --prefix decisa-frontend && cd decisa-backend && npx prisma generate && cd ../decisa-frontend && npm run build"
   publish = "decisa-frontend/dist"
 
 [functions]
