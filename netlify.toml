@@ -5,6 +5,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  included_files = ["decisa-backend/node_modules/@prisma/client/**", "decisa-backend/node_modules/.prisma/client/**"]
 
 [[redirects]]
   from = "/api/*"
